@@ -25,4 +25,7 @@ public interface VeterinarioRepository extends JpaRepository<Veterinario, Long> 
 
     @Query("SELECT COUNT(v) FROM Veterinario v WHERE v.ativo = true")
     long countAtivos();
+
+    @Query("SELECT v FROM Veterinario v WHERE LOWER(v.especialidade) LIKE LOWER(CONCAT('%', :especialidade, '%')) AND v.ativo = true")
+    List<Veterinario> findByEspecialidadeContainingIgnoreCase(@Param("especialidade") String especialidade);
 }
