@@ -56,7 +56,7 @@ public class ConsultaController {
             ConsultaResponseDTO responseDTO = convertToResponseDTO(consulta);
             return ResponseEntity.status(HttpStatus.CREATED).body(responseDTO);
         } catch (RuntimeException e) {
-            throw e; // Será tratado pelo GlobalExceptionHandler
+            throw e;
         }
     }
 

@@ -12,10 +12,9 @@ public class WebClientConfig {
     private String authServiceUrl;
 
     @Bean
-    public WebClient webClient() {
-        return WebClient.builder()
+    public WebClient webClient(WebClient.Builder builder) {
+        return builder
                 .baseUrl(authServiceUrl)
-                .defaultHeader("ngrok-skip-browser-warning", "true")
                 .build();
     }
 }
