@@ -8,7 +8,7 @@ Faz parte do **Sistema Distribuído para Gestão de Clínicas Veterinárias**, d
 
 ## 🚀 Tecnologias Utilizadas
 
-- **Java 17** + **Spring Boot 3.2.x**
+- **Java 21** + **Spring Boot 3.2.x**
 - **Spring Web / Spring Data JPA**
 - **PostgreSQL** (banco de dados dedicado do microserviço)
 - **JWT** (integração com serviço de autenticação do professor)
@@ -48,7 +48,7 @@ Authorization: Bearer <token_fornecido_pelo_professor>
 | `DELETE`| `/api/v1/consultas/{id}/cancelar`       | Cancela uma consulta existente |
 | `POST`| `/api/v1/consultas/horarios-disponiveis`  | Lista horários livres          |
 | `GET` | `/api/v1/veterinarios`                    | Lista todos os veterinários    |
-| `GET` | `/api/health`                             | Health check do microsserviço |
+| `GET` | `/api/v1/health`                          | Health check do microsserviço  |
 
 ---
 
@@ -65,7 +65,7 @@ Authorization: Bearer <token_fornecido_pelo_professor>
 
 ### Pré-requisitos
 
-- **Java 17+**
+- **Java 21**
 - **Maven 3.8+**
 - **PostgreSQL** rodando localmente
 
@@ -73,7 +73,7 @@ Authorization: Bearer <token_fornecido_pelo_professor>
 
 ```bash
 # 1. Clonar o repositório
-git clone https://github.com/<sua-organizacao>/ms-agendamento-consultas.git
+git clone https://github.com/Vital-Caja-Vet/ms-agendamento-consultas.git
 cd ms-agendamento-consultas
 
 # 2. Criar o banco no PostgreSQL
@@ -82,7 +82,7 @@ psql -U postgres -c "CREATE DATABASE ms_agendamento_consultas;"
 # 3. Configurar o application.properties (já incluso)
 spring.datasource.url=jdbc:postgresql://localhost:5432/ms_agendamento_consultas
 spring.datasource.username=postgres
-spring.datasource.password=root
+spring.datasource.password=suasenha
 
 # 4. Rodar o projeto
 mvn spring-boot:run
@@ -90,8 +90,8 @@ mvn spring-boot:run
 
 Após inicializar, acesse:
 
-📄 **Swagger UI:** [http://localhost:8081/swagger-ui.html](http://localhost:8081/swagger-ui.html)  
-📄 **API Docs (JSON):** [http://localhost:8081/api-docs](http://localhost:8081/api-docs)
+📄 **Swagger UI:** [http://localhost:8084/api/v1/apidocs](http://localhost:8084/api/v1/apidocs)  
+📄 **API Docs (JSON):** [http://localhost:8084/api/v1/docs/apispec_1.json](http://localhost:8084/api/v1/docs/apispec_1.json)
 
 ---
 
@@ -99,7 +99,7 @@ Após inicializar, acesse:
 
 ```bash
 # Agendar uma consulta
-curl -X POST http://localhost:8081/api/v1/consultas   -H "Authorization: Bearer token_jwt"   -H "Content-Type: application/json"   -d '{
+curl -X POST http://localhost:8084/api/v1/consultas   -H "Authorization: Bearer token_jwt"   -H "Content-Type: application/json"   -d '{
     "animalId": 1,
     "veterinarioId": 1,
     "dataHora": "2024-01-15T10:00:00",
@@ -113,6 +113,7 @@ curl -X POST http://localhost:8081/api/v1/consultas   -H "Authorization: Bearer 
 
 ```
 src/main/java/com/vitalcajavet/msagendamentoconsultas
+ ├── config/           # Endpoints REST
  ├── controller/       # Endpoints REST
  ├── dto/              # DTOs (objetos de transferência de dados)
  ├── model/            # Entidades JPA e enums
