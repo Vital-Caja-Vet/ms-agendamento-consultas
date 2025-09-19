@@ -133,7 +133,7 @@ flowchart TD
     C -->|Persistência| D[(PostgreSQL)]
 ```
 
-- **Frontend SPA:** envia o token JWT para o serviço de autenticação e para o microsserviço  
+- **Frontend SPA:** recebe após login o token JWT do serviço de autenticação, armazena no localstorage e os microserviços pode usar para validações  
 - **MS Agendamento de Consultas:** processa regras de negócio e consulta o banco PostgreSQL  
 - **Banco:** armazena todas as informações de agendamentos
 
