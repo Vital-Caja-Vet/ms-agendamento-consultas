@@ -27,11 +27,19 @@ public class VeterinarioService {
         return veterinarioRepository.findById(id);
     }
 
+    public Optional<Veterinario> findByCpf(String cpf) {
+        return veterinarioRepository.findByCpf(cpf);
+    }
+
     public boolean existsById(Long id) {
         return veterinarioRepository.existsById(id);
     }
 
     public Veterinario save(Veterinario veterinario) {
+        // 🔑 Validação: impedir CPF duplicado
+        veterinarioRepository.findByCpf(veterinario.getCpf())
+                .ifPresent(v -> { throw new RuntimeException("CPF já cadastrado para outro veterinário."); });
+
         return veterinarioRepository.save(veterinario);
     }
 
@@ -44,6 +52,7 @@ public class VeterinarioService {
                 .orElseThrow(() -> new RuntimeException("Veterinário não encontrado com ID: " + id));
 
         veterinario.setNome(veterinarioDetails.getNome());
+        veterinario.setCpf(veterinarioDetails.getCpf()); // 🔑 Atualiza CPF também
         veterinario.setEspecialidade(veterinarioDetails.getEspecialidade());
         veterinario.setAtivo(veterinarioDetails.getAtivo());
 

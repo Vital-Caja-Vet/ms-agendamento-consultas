@@ -17,6 +17,8 @@ public interface VeterinarioRepository extends JpaRepository<Veterinario, Long> 
 
     boolean existsById(Long id);
 
+    Optional<Veterinario> findByCpf(String cpf);
+
     @Query("SELECT v FROM Veterinario v WHERE v.ativo = true")
     List<Veterinario> findAllAtivos();
 

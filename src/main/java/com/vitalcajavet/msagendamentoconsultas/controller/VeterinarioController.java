@@ -1,6 +1,5 @@
 package com.vitalcajavet.msagendamentoconsultas.controller;
 
-
 import com.vitalcajavet.msagendamentoconsultas.model.Veterinario;
 import com.vitalcajavet.msagendamentoconsultas.service.VeterinarioService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -44,11 +43,23 @@ public class VeterinarioController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    @GetMapping("/cpf/{cpf}")
+    @Operation(summary = "Buscar veterinário por CPF")
+    public ResponseEntity<Veterinario> buscarPorCpf(@PathVariable String cpf) {
+        return veterinarioService.findByCpf(cpf)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
     @PostMapping
     @Operation(summary = "Criar novo veterinário")
     public ResponseEntity<Veterinario> criar(@RequestBody Veterinario veterinario) {
-        Veterinario veterinarioSalvo = veterinarioService.save(veterinario);
-        return ResponseEntity.status(HttpStatus.CREATED).body(veterinarioSalvo);
+        try {
+            Veterinario veterinarioSalvo = veterinarioService.save(veterinario);
+            return ResponseEntity.status(HttpStatus.CREATED).body(veterinarioSalvo);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).build(); // 409 se CPF duplicado
+        }
     }
 
     @PutMapping("/{id}")

@@ -12,6 +12,7 @@ import com.vitalcajavet.msagendamentoconsultas.repository.ConsultaRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -36,7 +37,7 @@ public class ConsultaService {
 
     @Transactional
     public Consulta agendarConsulta(ConsultaRequestDTO requestDTO) {
-        validarDadosAgendamento(requestDTO);
+        validarDadosAgendamento(requestDTO, null);
 
         Consulta consulta = new Consulta();
         consulta.setAnimalId(requestDTO.getAnimalId());
@@ -48,21 +49,20 @@ public class ConsultaService {
         return consultaRepository.save(consulta);
     }
 
-    private void validarDadosAgendamento(ConsultaRequestDTO requestDTO) {
+    private void validarDadosAgendamento(ConsultaRequestDTO requestDTO, Long consultaIdIgnorada) {
         Veterinario veterinario = veterinarioService.findById(requestDTO.getVeterinarioId())
-                .orElseThrow(() -> new RuntimeException("Veterinário não encontrado"));
+                .orElseThrow(() -> new RuntimeException("Veterinario nao encontrado"));
 
         if (Boolean.FALSE.equals(veterinario.getAtivo())) {
-            throw new RuntimeException("Veterinário não está ativo");
+            throw new RuntimeException("Veterinario nao esta ativo");
         }
 
         if (requestDTO.getDataHora().isBefore(LocalDateTime.now())) {
-            throw new RuntimeException("Não é possível agendar consultas no passado");
+            throw new RuntimeException("Nao e possivel agendar consultas no passado");
         }
 
-        if (consultaRepository.existsByVeterinarioIdAndDataHora(
-                requestDTO.getVeterinarioId(), requestDTO.getDataHora())) {
-            throw new RuntimeException("Já existe uma consulta agendada para este veterinário no mesmo horário");
+        if (encontrarHorarioConflitante(consultaIdIgnorada, requestDTO.getVeterinarioId(), requestDTO.getDataHora()).isPresent()) {
+            throw new RuntimeException("Ja existe uma consulta agendada para este veterinario no mesmo horario");
         }
 
         validarHorarioComercial(requestDTO.getDataHora());
@@ -162,7 +162,7 @@ public class ConsultaService {
 
         List<LocalDateTime> horariosDisponiveis = todosHorarios.stream()
                 .filter(horario -> !horariosOcupados.contains(horario))
-                .filter(horario -> !horario.isBefore(LocalDateTime.now())) // Não mostrar horários passados se for hoje
+                .filter(horario -> !horario.isBefore(LocalDateTime.now()))
                 .toList();
 
         HorarioDisponivelResponseDTO response = new HorarioDisponivelResponseDTO();
@@ -217,7 +217,7 @@ public class ConsultaService {
             throw new RuntimeException("Não é possível alterar uma consulta cancelada");
         }
 
-        validarDadosAgendamento(requestDTO);
+        validarDadosAgendamento(requestDTO, id);
 
         consulta.setAnimalId(requestDTO.getAnimalId());
         consulta.setVeterinarioId(requestDTO.getVeterinarioId());
@@ -236,6 +236,16 @@ public class ConsultaService {
     }
 
     public boolean verificarDisponibilidade(Long veterinarioId, LocalDateTime dataHora) {
-        return !consultaRepository.existsByVeterinarioIdAndDataHora(veterinarioId, dataHora);
+        return encontrarHorarioConflitante(null, veterinarioId, dataHora).isEmpty();
+    }
+
+    private Optional<LocalDateTime> encontrarHorarioConflitante(Long consultaIdIgnorada, Long veterinarioId, LocalDateTime dataHora) {
+        int intervalo = horarioComercialProperties.getIntervaloMinutos();
+        return consultaRepository.findByVeterinarioIdAndData(veterinarioId, dataHora).stream()
+                .filter(consulta -> consultaIdIgnorada == null || !consulta.getId().equals(consultaIdIgnorada))
+                .filter(consulta -> Math.abs(Duration.between(consulta.getDataHora(), dataHora).toMinutes()) < intervalo)
+                .map(Consulta::getDataHora)
+                .findFirst();
     }
 }
+

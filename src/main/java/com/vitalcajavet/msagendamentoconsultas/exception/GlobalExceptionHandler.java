@@ -1,4 +1,4 @@
-package com.agendamento.exception;
+package com.vitalcajavet.msagendamentoconsultas.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

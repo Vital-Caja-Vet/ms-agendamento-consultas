@@ -4,6 +4,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+
 import reactor.core.publisher.Mono;
 
 @Service
@@ -26,8 +27,6 @@ public class JwtService {
 
             logger.debug("Validando token com endpoint /profile/me/");
 
-            // Usando o endpoint /profile/me/ como no Python
-            // Se retornar 200 OK, o token é válido
             webClient.get()
                     .uri("/profile/me/")
                     .header(HttpHeaders.AUTHORIZATION, tokenToSend)
@@ -39,25 +38,23 @@ public class JwtService {
                     .onStatus(
                             status -> status == HttpStatus.FORBIDDEN,
                             response -> {
-                                // 403 FORBIDDEN pode significar que o token é válido mas o usuário não tem acesso ao endpoint
-                                // No contexto de validação, podemos considerar como token válido
+
                                 logger.warn("Token retornou 403 FORBIDDEN - considerado válido para fins de autenticação");
-                                return Mono.empty(); // Não lança exceção
+                                return Mono.empty();
                             }
                     )
                     .onStatus(
                             status -> status.is5xxServerError(),
                             response -> Mono.error(new JwtValidationException("Serviço de autenticação indisponível"))
                     )
-                    .toBodilessEntity() // Só nos importa o status code, não o corpo
+                    .toBodilessEntity()
                     .block();
 
-            // Se chegou até aqui sem exception, o token é válido
             logger.debug("Token validado com sucesso via /profile/me/");
             return true;
 
         } catch (JwtValidationException e) {
-            throw e; // Re-lança exceções específicas
+            throw e;
         } catch (Exception e) {
             throw new JwtValidationException("Falha na validação do token: " + e.getMessage());
         }
@@ -78,7 +75,6 @@ public class JwtService {
 
             String payload = new String(java.util.Base64.getUrlDecoder().decode(parts[1]));
 
-            // Tenta extrair username de diferentes formas
             if (payload.contains("\"username\"")) {
                 return payload.split("\"username\":\"")[1].split("\"")[0];
             }

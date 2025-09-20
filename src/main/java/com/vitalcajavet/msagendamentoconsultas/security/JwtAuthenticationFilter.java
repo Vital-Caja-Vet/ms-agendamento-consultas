@@ -29,13 +29,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected boolean shouldNotFilter(HttpServletRequest request) {
         String path = request.getServletPath();
         return path.startsWith("/api/v1/docs")
-                || path.startsWith("/api/v1/api-docs")
+                || path.startsWith("/api/v1/swagger-ui")
+                || path.startsWith("/api/v1/docs/apispec_1.json")
                 || path.startsWith("/v3/api-docs")
                 || path.startsWith("/swagger-ui")
-                || path.startsWith("/swagger-ui.html")
-                || path.startsWith("/webjars")
-                || path.startsWith("/swagger-resources")
-                || path.startsWith("/configuration")
                 || path.startsWith("/api/v1/auth");
     }
 
@@ -47,8 +44,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String authHeader = request.getHeader("Authorization");
 
         if (authHeader == null || authHeader.isBlank()) {
-            logger.warn("Token de autenticação não fornecido para: {}", request.getServletPath());
-            sendError(response, "Token de autenticação não fornecido");
+            filterChain.doFilter(request, response);
             return;
         }
 

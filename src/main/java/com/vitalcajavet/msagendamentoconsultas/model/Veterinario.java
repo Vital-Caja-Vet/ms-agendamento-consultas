@@ -21,6 +21,9 @@ public class Veterinario {
     @Column(nullable = false, length = 100)
     private String nome;
 
+    @Column(nullable = false, length = 100)
+    private String cpf;
+
     @Column(length = 100)
     private String especialidade;
 
