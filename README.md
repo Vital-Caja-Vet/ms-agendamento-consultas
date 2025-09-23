@@ -113,7 +113,7 @@ curl -X POST http://localhost:8084/api/v1/consultas   -H "Authorization: Bearer 
 
 ```
 src/main/java/com/vitalcajavet/msagendamentoconsultas
- ├── config/           # Endpoints REST
+ ├── config/           # Configs CORS e outras coisas
  ├── controller/       # Endpoints REST
  ├── dto/              # DTOs (objetos de transferência de dados)
  ├── model/            # Entidades JPA e enums
