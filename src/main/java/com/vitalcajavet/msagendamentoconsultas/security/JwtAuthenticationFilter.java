@@ -33,6 +33,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 || path.startsWith("/api/v1/docs/apispec_1.json")
                 || path.startsWith("/v3/api-docs")
                 || path.startsWith("/swagger-ui")
+                || path.startsWith("/api/v1/health")
                 || path.startsWith("/api/v1/auth");
     }
 
@@ -79,3 +80,4 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         response.getWriter().write("{\"error\": \"" + message + "\", \"status\": 401}");
     }
 }
+

@@ -31,7 +31,8 @@ public class SecurityConfig {
                                 "/api/v1/docs/apispec_1.json",
                                 "/api/v1/docs/apispec_1.json/**",
                                 "/v3/api-docs/**",
-                                "/swagger-ui/**"
+                                "/swagger-ui/**",
+                                "/api/v1/health"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
@@ -40,3 +41,4 @@ public class SecurityConfig {
         return http.build();
     }
 }
+
