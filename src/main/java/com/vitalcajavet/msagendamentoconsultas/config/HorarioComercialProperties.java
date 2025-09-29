@@ -10,6 +10,5 @@ import org.springframework.stereotype.Component;
 public class HorarioComercialProperties {
     private int inicio;
     private int fim;
-    private int intervaloMinutos;
     private int horasMinimasCancelamento;
 }

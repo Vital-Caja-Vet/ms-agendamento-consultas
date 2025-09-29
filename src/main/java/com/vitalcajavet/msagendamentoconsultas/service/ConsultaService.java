@@ -9,10 +9,12 @@ import com.vitalcajavet.msagendamentoconsultas.model.Veterinario;
 import com.vitalcajavet.msagendamentoconsultas.model.enums.StatusConsulta;
 import com.vitalcajavet.msagendamentoconsultas.model.enums.TipoConsulta;
 import com.vitalcajavet.msagendamentoconsultas.repository.ConsultaRepository;
+import com.vitalcajavet.msagendamentoconsultas.exception.BadRequestException;
+import com.vitalcajavet.msagendamentoconsultas.exception.ConflictException;
+import com.vitalcajavet.msagendamentoconsultas.exception.NotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -51,18 +53,18 @@ public class ConsultaService {
 
     private void validarDadosAgendamento(ConsultaRequestDTO requestDTO, Long consultaIdIgnorada) {
         Veterinario veterinario = veterinarioService.findById(requestDTO.getVeterinarioId())
-                .orElseThrow(() -> new RuntimeException("Veterinario nao encontrado"));
+                .orElseThrow(() -> new NotFoundException("Veterinario nao encontrado"));
 
         if (Boolean.FALSE.equals(veterinario.getAtivo())) {
-            throw new RuntimeException("Veterinario nao esta ativo");
+            throw new BadRequestException("Veterinario nao esta ativo");
         }
 
         if (requestDTO.getDataHora().isBefore(LocalDateTime.now())) {
-            throw new RuntimeException("Nao e possivel agendar consultas no passado");
+            throw new BadRequestException("Nao e possivel agendar consultas no passado");
         }
 
         if (encontrarHorarioConflitante(consultaIdIgnorada, requestDTO.getVeterinarioId(), requestDTO.getDataHora()).isPresent()) {
-            throw new RuntimeException("Ja existe uma consulta agendada para este veterinario no mesmo horario");
+            throw new ConflictException("Ja existe uma consulta agendada para este veterinario no mesmo horario");
         }
 
         validarHorarioComercial(requestDTO.getDataHora());
@@ -79,10 +81,10 @@ public class ConsultaService {
                     + horarioComercialProperties.getFim() + ":00)");
         }
 
-        int minutos = horario.getMinute();
-        if (minutos % horarioComercialProperties.getIntervaloMinutos() != 0) {
+        // minutos removido: aceita qualquer minuto
+        if (false) {
             throw new RuntimeException("Os horários devem ser marcados em intervalos de "
-                    + horarioComercialProperties.getIntervaloMinutos() + " minutos (ex: 08:00, 08:30, 09:00)");
+                    + " minutos (ex: 08:00, 08:30, 09:00)"); // regra de intervalo removida
         }
     }
 
@@ -181,7 +183,7 @@ public class ConsultaService {
 
         while (horarioAtual.isBefore(fimDoDia)) {
             horarios.add(horarioAtual);
-            horarioAtual = horarioAtual.plusMinutes(horarioComercialProperties.getIntervaloMinutos());
+            horarioAtual = horarioAtual.plusMinutes(1);
         }
 
         return horarios;
@@ -240,10 +242,11 @@ public class ConsultaService {
     }
 
     private Optional<LocalDateTime> encontrarHorarioConflitante(Long consultaIdIgnorada, Long veterinarioId, LocalDateTime dataHora) {
-        int intervalo = horarioComercialProperties.getIntervaloMinutos();
+        // regra de intervalo removida
+        int intervalo = 0;
         return consultaRepository.findByVeterinarioIdAndData(veterinarioId, dataHora).stream()
                 .filter(consulta -> consultaIdIgnorada == null || !consulta.getId().equals(consultaIdIgnorada))
-                .filter(consulta -> Math.abs(Duration.between(consulta.getDataHora(), dataHora).toMinutes()) < intervalo)
+                .filter(consulta -> consulta.getDataHora().equals(dataHora))
                 .map(Consulta::getDataHora)
                 .findFirst();
     }
