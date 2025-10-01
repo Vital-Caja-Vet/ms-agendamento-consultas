@@ -81,10 +81,9 @@ public class ConsultaService {
                     + horarioComercialProperties.getFim() + ":00)");
         }
 
-        // minutos removido: aceita qualquer minuto
         if (false) {
             throw new RuntimeException("Os horários devem ser marcados em intervalos de "
-                    + " minutos (ex: 08:00, 08:30, 09:00)"); // regra de intervalo removida
+                    + " minutos (ex: 08:00, 08:30, 09:00)");
         }
     }
 

@@ -1,5 +1,6 @@
 package com.vitalcajavet.msagendamentoconsultas.model;
 
+import com.vitalcajavet.msagendamentoconsultas.model.enums.Sexo;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -20,6 +21,10 @@ public class Veterinario {
 
     @Column(nullable = false, length = 100)
     private String nome;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
+    private Sexo sexo;
 
     @Column(nullable = false, length = 100)
     private String cpf;

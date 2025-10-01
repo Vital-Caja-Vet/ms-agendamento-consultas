@@ -36,7 +36,6 @@ public class VeterinarioService {
     }
 
     public Veterinario save(Veterinario veterinario) {
-        // 🔑 Validação: impedir CPF duplicado
         veterinarioRepository.findByCpf(veterinario.getCpf())
                 .ifPresent(v -> { throw new RuntimeException("CPF já cadastrado para outro veterinário."); });
 
@@ -52,7 +51,8 @@ public class VeterinarioService {
                 .orElseThrow(() -> new RuntimeException("Veterinário não encontrado com ID: " + id));
 
         veterinario.setNome(veterinarioDetails.getNome());
-        veterinario.setCpf(veterinarioDetails.getCpf()); // 🔑 Atualiza CPF também
+        veterinario.setSexo(veterinarioDetails.getSexo());
+        veterinario.setCpf(veterinarioDetails.getCpf()); 
         veterinario.setEspecialidade(veterinarioDetails.getEspecialidade());
         veterinario.setAtivo(veterinarioDetails.getAtivo());
 
