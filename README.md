@@ -116,8 +116,8 @@ src/main/java/com/vitalcajavet/msagendamentoconsultas
  ├── config/           # Configs CORS e outras coisas
  ├── controller/       # Endpoints REST
  ├── dto/              # DTOs (objetos de transferência de dados)
- ├── model/            # Entidades JPA e enums
- ├── repository/       # Interfaces JPA Repositories
+ ├── model/            # Entidades e enums
+ ├── repository/       # Interfaces Repositories
  ├── service/          # Regras de negócio e validações
  └── security/         # Configuração de autenticação JWT
 ```
