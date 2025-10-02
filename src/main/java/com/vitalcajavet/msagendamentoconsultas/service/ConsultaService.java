@@ -241,8 +241,6 @@ public class ConsultaService {
     }
 
     private Optional<LocalDateTime> encontrarHorarioConflitante(Long consultaIdIgnorada, Long veterinarioId, LocalDateTime dataHora) {
-        // regra de intervalo removida
-        int intervalo = 0;
         return consultaRepository.findByVeterinarioIdAndData(veterinarioId, dataHora).stream()
                 .filter(consulta -> consultaIdIgnorada == null || !consulta.getId().equals(consultaIdIgnorada))
                 .filter(consulta -> consulta.getDataHora().equals(dataHora))
